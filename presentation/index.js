@@ -14,6 +14,8 @@ import {
   Text
 } from "spectacle";
 
+import AboutMeSlide from "./slideTemplates/about-me-slide.jsx";
+
 // Import image preloader util
 import preloader from "spectacle/lib/utils/preloader";
 
@@ -48,6 +50,7 @@ export default class Presentation extends React.Component {
   render() {
     return (
       <Deck transition={["zoom", "slide"]} transitionDuration={500} theme={theme}>
+        <AboutMeSlide />
         <Slide transition={["zoom"]} bgColor="primary">
           <Heading size={1} fit caps lineHeight={1} textColor="secondary">
             Spectacle Boilerplate
