@@ -1,0 +1,29 @@
+module.exports = function (shipit) {
+  require("shipit-deploy")(shipit);
+
+  shipit.initConfig({
+    default: {
+      workspace: "/tmp/shipit",
+      deployTo: "/var/www/my-example-project",
+      repositoryUrl: "git@github.com:hannahhoward/my-example-project.git",
+      ignores: [".git", "node_modules"],
+      keepReleases: 2,
+      deleteOnRollback: false,
+      shallowClone: true
+    },
+    production: {
+      servers: "root@my-example-server.com"
+    }
+  });
+
+  shipit.blTask("build", () => {
+    return shipit.local("ln -s ~/presentations/my-example-project/node_modules /tmp/shipit/node_modules").then(() => {
+      return shipit.local("npm install", { cwd: "/tmp/shipit" });
+    }).then(() => {
+      return shipit.local("npm run build", { cwd: "/tmp/shipit" });
+    });
+  });
+  shipit.on("fetched", () => {
+    shipit.start("build");
+  });
+};
