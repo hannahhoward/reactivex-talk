@@ -1,0 +1,89 @@
+// Import React
+import React from "react";
+import PropTypes from "prop-types";
+
+// Import Spectacle Core tags
+import {
+  Heading,
+  Image,
+  Text
+} from "spectacle";
+
+import asSlide from "./as-slide.jsx";
+import { headingColor, textColor } from "./utilities.jsx";
+
+const fullScreenStyle = {
+  display: "flex",
+  alignItems: "center",
+  flexDirection: "column",
+  top: "calc(-50vh + 50%)",
+  left: "calc(-50vw + 50%)",
+  position: "absolute",
+  width: "100vw",
+  height: "100vh",
+  padding: "10vh 10vw",
+};
+
+const imageStyle = {
+  height: "100%",
+  position: "absolute",
+  top: 0,
+  left: "50%",
+  transform: "translateX(-50%)",
+};
+
+const ImageSlide = ({ title, image, size, fit, caps, inverted, text }) => {
+  const imageSrc = require(`../../assets/${image}`).replace("/", "");
+ 
+  return (
+    <div style={fullScreenStyle}>
+      {!!title &&
+        <div style={{ width: 1000 }}>
+          <Heading
+            size={size}
+            fit={fit}
+            caps={caps}
+            textColor={ headingColor(inverted) }
+            style={{ marginBottom: ".5em" }}
+          >
+            {title}
+          </Heading>
+        </div>}
+      <div style={{ flex: 1, position: "relative" }}>
+        <Image
+          style={imageStyle}
+          src={imageSrc}
+        />
+      </div>
+      {!!text &&
+        <div style={{ width: 1000 }}>
+          <Text
+            textColor={ textColor(inverted) }
+            style={{ marginTop: ".5em" }}
+          >
+            {text}
+          </Text>
+        </div>}
+    </div>
+  );
+};
+
+ImageSlide.propTypes = {
+  caps: PropTypes.bool.isRequired,
+  definition: PropTypes.string.isRequired,
+  fit: PropTypes.bool.isRequired,
+  image: PropTypes.string.isRequired,
+  inverted: PropTypes.bool,
+  size: PropTypes.number.isRequired,
+  text: PropTypes.string,
+  title: PropTypes.string
+};
+
+ImageSlide.defaultProps = {
+  inverted: false,
+  size: 1,
+  fit: true,
+  caps: true
+};
+
+export default asSlide(ImageSlide);

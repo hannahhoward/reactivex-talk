@@ -16,6 +16,9 @@ import {
 
 import AboutMeSlide from "./slideTemplates/about-me-slide.jsx";
 import DefinitionSlide from "./slideTemplates/definition-slide.jsx";
+import SimpleSlide from "./slideTemplates/simple-slide.jsx";
+import ConceptSlide from "./slideTemplates/concept-slide.jsx";
+import ImageSlide from "./slideTemplates/image-slide.jsx";
 
 // Import image preloader util
 import preloader from "spectacle/lib/utils/preloader";
@@ -53,6 +56,13 @@ export default class Presentation extends React.Component {
       <Deck transition={["zoom", "slide"]} transitionDuration={500} theme={theme}>
         <AboutMeSlide />
         <DefinitionSlide term="Rule #1" definition="Don't fuck it up" />
+        <DefinitionSlide inverted term="Rule #2" definition="Don't fuck it up inverted" />
+        <SimpleSlide statement="Keep it real" />
+        <SimpleSlide inverted statement="Keep it real inverted" />
+        <ConceptSlide concept="Here's the thing" description="Everything is awesome" />
+        <ConceptSlide inverted concept="Here's the inverted thing" description="Everything is awesome invertedly" />
+        <ImageSlide image="poohbear.jpg" title="Obligatory personal anecdote" text="I like dogs" />
+        <ImageSlide inverted image="zoolander.gif" title="WTF talk did I just come to?" />
         <Slide transition={["zoom"]} bgColor="primary">
           <Heading size={1} fit caps lineHeight={1} textColor="secondary">
             Spectacle Boilerplate
