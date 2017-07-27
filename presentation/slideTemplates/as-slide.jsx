@@ -6,6 +6,20 @@ import { getStyles } from "spectacle/lib/utils/base";
 import Radium from "radium";
 import { addFragment } from "spectacle/lib/actions";
 import { Transitionable, renderTransition } from "spectacle/lib/components/transitionable";
+import { bgColor } from "./utilities.jsx";
+
+const getSlideStyles = function () {
+  const { inverted } = this.props;
+  const currentBgColor = bgColor(inverted);
+  let color = "";
+  if (!this.context.styles.colors.hasOwnProperty(currentBgColor)) {
+    color = currentBgColor;
+  } else {
+    color = this.context.styles.colors[currentBgColor];
+  }
+
+  return { backgroundColor: color };
+};
 
 export default (Component) => {
 
@@ -146,6 +160,7 @@ export default (Component) => {
           style={[
             styles.outer,
             getStyles.call(this),
+            getSlideStyles.call(this),
             printStyles,
             presenterStyle
           ]}
@@ -176,7 +191,8 @@ export default (Component) => {
     align: "center center",
     presenterStyle: {},
     style: {},
-    viewerScaleMode: false
+    viewerScaleMode: false,
+    inverted: false
   };
 
   Slide.propTypes = {
@@ -186,6 +202,7 @@ export default (Component) => {
     dispatch: PropTypes.func,
     export: PropTypes.bool,
     hash: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    inverted: PropTypes.bool,
     lastSlideIndex: PropTypes.number,
     margin: PropTypes.number,
     maxHeight: PropTypes.number,
