@@ -11,23 +11,12 @@ import {
 } from "spectacle";
 
 import asSlide from "./as-slide.jsx";
-
-const fullScreenStyle = {
-  display: "flex",
-  alignItems: "center",
-  flexDirection: "row",
-  top: "calc(-50vh + 50%)",
-  left: "calc(-50vw + 50%)",
-  position: "absolute",
-  width: "100vw",
-  height: "100vh",
-  padding: "10vh 10vw"
-};
+import FullScreen from "./full-screen.jsx";
 
 const AboutMeSlide = () => {
   const tgwLogo = require("../../assets/techgirlwonder-01.png").replace("/", "");
   return (
-      <div style={fullScreenStyle}>
+      <FullScreen>
         <div style={{ flexGrow: 0, height: "100%" }}>
           <Appear >
               <Image src={tgwLogo} height="100%" margin="0px 40px 0px 0px" />
@@ -43,7 +32,7 @@ const AboutMeSlide = () => {
             <Appear><ListItem>Twitter above!</ListItem></Appear>
           </List>
         </div>
-      </div>
+      </FullScreen>
   );
 };
 

@@ -9,12 +9,15 @@ import {
 
 import asSlide from "./as-slide.jsx";
 import { headingColor } from "./utilities.jsx";
+import FullScreen from "./full-screen.jsx";
 
 const SimpleSlide = ({ inverted, statement, size, fit, caps }) => {
   return (
-    <Heading size={size} fit={fit} caps={caps} textColor={headingColor(inverted)}>
-      {statement}
-    </Heading>
+    <FullScreen column>
+      <Heading size={size} fit={fit} caps={caps} textColor={headingColor(inverted)}>
+        {statement}
+      </Heading>
+    </FullScreen>
   );
 };
 

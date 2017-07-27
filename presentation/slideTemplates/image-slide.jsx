@@ -11,18 +11,7 @@ import {
 
 import asSlide from "./as-slide.jsx";
 import { headingColor, textColor } from "./utilities.jsx";
-
-const fullScreenStyle = {
-  display: "flex",
-  alignItems: "center",
-  flexDirection: "column",
-  top: "calc(-50vh + 50%)",
-  left: "calc(-50vw + 50%)",
-  position: "absolute",
-  width: "100vw",
-  height: "100vh",
-  padding: "10vh 10vw",
-};
+import FullScreen from "./full-screen.jsx";
 
 const imageStyle = {
   height: "100%",
@@ -36,7 +25,7 @@ const ImageSlide = ({ title, image, size, fit, caps, inverted, text }) => {
   const imageSrc = require(`../../assets/${image}`).replace("/", "");
  
   return (
-    <div style={fullScreenStyle}>
+    <FullScreen column>
       {!!title &&
         <div style={{ width: 1000 }}>
           <Heading
@@ -64,7 +53,7 @@ const ImageSlide = ({ title, image, size, fit, caps, inverted, text }) => {
             {text}
           </Text>
         </div>}
-    </div>
+    </FullScreen>
   );
 };
 

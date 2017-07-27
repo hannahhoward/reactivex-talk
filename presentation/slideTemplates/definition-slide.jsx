@@ -10,17 +10,18 @@ import {
 
 import asSlide from "./as-slide.jsx";
 import { headingColor, textColor } from "./utilities.jsx";
+import FullScreen from "./full-screen.jsx";
 
 const DefinitionSlide = ({ inverted, term, definition, size, fit, caps }) => {
   return (
-    <div>
+    <FullScreen column>
     <Heading size={size} fit={fit} caps={caps} textColor={headingColor(inverted)}>
       {term}:
     </Heading>
     <Text textColor={textColor(inverted)}>
       {definition}
     </Text>
-    </div>
+    </FullScreen>
   );
 };
 
