@@ -18,7 +18,7 @@ const DefinitionSlide = ({ inverted, term, definition, size, fit, caps }) => {
     <Heading size={size} fit={fit} caps={caps} textColor={headingColor(inverted)}>
       {term}:
     </Heading>
-    <Text textColor={textColor(inverted)}>
+    <Text style={{ marginTop: "40px" }} textColor={textColor(inverted)}>
       {definition}
     </Text>
     </FullScreen>

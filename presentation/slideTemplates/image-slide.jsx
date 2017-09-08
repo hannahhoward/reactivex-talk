@@ -14,16 +14,16 @@ import { headingColor, textColor } from "./utilities.jsx";
 import FullScreen from "./full-screen.jsx";
 
 const imageStyle = {
-  height: "100%",
+  height: "90%",
   position: "absolute",
-  top: 0,
+  top: "10%",
   left: "50%",
   transform: "translateX(-50%)",
 };
 
 const ImageSlide = ({ title, image, size, fit, caps, inverted, text }) => {
   const imageSrc = require(`../../assets/${image}`).replace("/", "");
- 
+
   return (
     <FullScreen column>
       {!!title &&
@@ -59,12 +59,11 @@ const ImageSlide = ({ title, image, size, fit, caps, inverted, text }) => {
 
 ImageSlide.propTypes = {
   caps: PropTypes.bool.isRequired,
-  definition: PropTypes.string.isRequired,
   fit: PropTypes.bool.isRequired,
   image: PropTypes.string.isRequired,
   inverted: PropTypes.bool,
   size: PropTypes.number.isRequired,
-  text: PropTypes.string,
+  text: PropTypes.node,
   title: PropTypes.string
 };
 
