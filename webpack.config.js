@@ -66,5 +66,9 @@ module.exports = {
       loader: "url-loader?mimetype=image/jpg",
       include: path.join(__dirname, "assets")
     }]
+  },
+  resolve: {
+    // you can now require('file') instead of require('file.coffee')
+    extensions: ['.js', '.jsx', '.json']
   }
 };

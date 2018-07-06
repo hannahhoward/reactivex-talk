@@ -3,56 +3,50 @@ import React from "react";
 import PropTypes from "prop-types";
 
 // Import Spectacle Core tags
-import {
-  Heading,
-  Image,
-  Text
-} from "spectacle";
+import { Heading, Image, Text } from "spectacle";
 
 import asSlide from "./as-slide.jsx";
 import { headingColor, textColor } from "./utilities.jsx";
 import FullScreen from "./full-screen.jsx";
 
 const imageStyle = {
-  height: "90%",
   position: "absolute",
-  top: "10%",
   left: "50%",
-  transform: "translateX(-50%)",
+  transform: "translateX(-50%)"
 };
 
 const ImageSlide = ({ title, image, size, fit, caps, inverted, text }) => {
   const imageSrc = require(`../../assets/${image}`).replace("/", "");
-
+  const thisImageStyle = {
+    ...imageStyle,
+    top: title ? "10%" : "0%",
+    height: title ? "90%" : "100%"
+  };
   return (
     <FullScreen column>
-      {!!title &&
+      {!!title && (
         <div style={{ width: 1000 }}>
           <Heading
             size={size}
             fit={fit}
             caps={caps}
-            textColor={ headingColor(inverted) }
+            textColor={headingColor(inverted)}
             style={{ marginBottom: ".5em" }}
           >
             {title}
           </Heading>
-        </div>}
+        </div>
+      )}
       <div style={{ flex: 1, position: "relative" }}>
-        <Image
-          style={imageStyle}
-          src={imageSrc}
-        />
+        <Image style={thisImageStyle} src={imageSrc} />
       </div>
-      {!!text &&
+      {!!text && (
         <div style={{ width: 1000 }}>
-          <Text
-            textColor={ textColor(inverted) }
-            style={{ marginTop: ".5em" }}
-          >
+          <Text textColor={textColor(inverted)} style={{ marginTop: ".5em" }}>
             {text}
           </Text>
-        </div>}
+        </div>
+      )}
     </FullScreen>
   );
 };
