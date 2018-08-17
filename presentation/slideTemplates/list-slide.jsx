@@ -3,33 +3,47 @@ import React from "react";
 import PropTypes from "prop-types";
 
 // Import Spectacle Core tags
-import {
-  Heading,
-  List,
-  ListItem
-} from "spectacle";
+import { Heading, List, ListItem, Appear } from "spectacle";
 
 import asSlide from "./as-slide.jsx";
 import { headingColor, textColor } from "./utilities.jsx";
 import FullScreen from "./full-screen.jsx";
 
-const ListSlide = ({ inverted, title, list, size, fit, caps }) => {
+const ListSlide = ({
+  inverted,
+  title,
+  list,
+  size,
+  fit,
+  caps,
+  ordered,
+  appear,
+  children
+}) => {
   return (
     <FullScreen column>
-      <Heading fit={fit} size={size} caps={caps} textColor={headingColor(inverted)}>
-        { title }
+      <Heading
+        fit={fit}
+        size={size}
+        caps={caps}
+        textColor={headingColor(inverted)}
+      >
+        {title}
       </Heading>
-      <List ordered textColor={textColor(inverted)}>
-        {
-          list.map((listItem) => {
-            return (
-              <ListItem key={listItem}>
-                {listItem}
-              </ListItem>
-            );
-          })
-        }
+      <List ordered={ordered} textColor={textColor(inverted)}>
+        {appear
+          ? list.map(listItem => {
+              return (
+                <Appear>
+                  <ListItem>{listItem}</ListItem>
+                </Appear>
+              );
+            })
+          : list.map(listItem => {
+              return <ListItem key={listItem}>{listItem}</ListItem>;
+            })}
       </List>
+      {children}
     </FullScreen>
   );
 };
@@ -39,15 +53,19 @@ ListSlide.propTypes = {
   fit: PropTypes.bool.isRequired,
   inverted: PropTypes.bool,
   list: PropTypes.arrayOf(PropTypes.string).isRequired,
+  ordered: PropTypes.bool,
   size: PropTypes.number.isRequired,
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
+  appear: PropTypes.bool.isRequired
 };
 
 ListSlide.defaultProps = {
   inverted: false,
   size: 4,
   fit: false,
-  caps: true
+  caps: true,
+  ordered: true,
+  appear: true
 };
 
 export default asSlide(ListSlide);

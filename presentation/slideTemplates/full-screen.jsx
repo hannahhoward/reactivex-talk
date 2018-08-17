@@ -13,20 +13,22 @@ const fullScreenStyle = {
   padding: "10vh 10vw"
 };
 
-const FullScreen = ({ children, column }) => {
+const FullScreen = ({ children, column, style }) => {
   const flexDirection = column ? "column" : "row";
   const justifyContent = column ? "center" : "flex-start";
-  const style = { ...fullScreenStyle, flexDirection, justifyContent };
-  return (
-    <div style={style}>
-      {children}
-    </div>
-  );
+  const finalStyle = {
+    ...fullScreenStyle,
+    ...style,
+    flexDirection,
+    justifyContent
+  };
+  return <div style={finalStyle}>{children}</div>;
 };
 
 FullScreen.propTypes = {
   children: PropTypes.node,
-  column: PropTypes.bool.isRequired
+  column: PropTypes.bool.isRequired,
+  style: PropTypes.object
 };
 
 FullScreen.defaultProps = {

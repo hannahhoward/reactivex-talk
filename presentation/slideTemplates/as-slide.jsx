@@ -1,14 +1,20 @@
-/* eslint-disable no-invalid-this */
 import React from "react";
 import PropTypes from "prop-types";
 import isUndefined from "lodash/isUndefined";
+import isFunction from "lodash/isFunction";
 import { getStyles } from "spectacle/lib/utils/base";
-import Radium from "radium";
 import { addFragment } from "spectacle/lib/actions";
-import { Transitionable, renderTransition } from "spectacle/lib/components/transitionable";
+import stepCounter from "spectacle/lib/utils/step-counter";
+import {
+  SlideContainer,
+  SlideContent,
+  SlideContentWrapper
+} from "spectacle/lib/components/slide-components";
+import { VictoryAnimation } from "victory-core";
+import findIndex from "lodash/findIndex";
 import { bgColor } from "./utilities.jsx";
 
-const getSlideStyles = function () {
+const getSlideStyles = function() {
   const { inverted } = this.props;
   const currentBgColor = bgColor(inverted);
   let color = "";
@@ -21,128 +27,221 @@ const getSlideStyles = function () {
   return { backgroundColor: color };
 };
 
-export default (Component) => {
-
-  @Transitionable
-  @Radium
+export default Component => {
   class Slide extends React.PureComponent {
+    constructor() {
+      super(...arguments);
+
+      this.routerCallback = this.routerCallback.bind(this);
+      this.setZoom = this.setZoom.bind(this);
+      this.transitionDirection = this.transitionDirection.bind(this);
+      this.getTransitionKeys = this.getTransitionKeys.bind(this);
+      this.getTransitionStyles = this.getTransitionStyles.bind(this);
+      this.getRouteSlideIndex = this.getRouteSlideIndex.bind(this);
+
+      this.stepCounter = stepCounter();
+    }
+
     state = {
       contentScale: 1,
+      reverse: false,
       transitioning: true,
       z: 1,
       zoom: 1
     };
 
     getChildContext() {
-      return { slideHash: this.props.hash };
+      return {
+        stepCounter: {
+          setFragments: this.stepCounter.setFragments
+        },
+        slideHash: this.props.hash
+      };
     }
 
     componentDidMount() {
       this.setZoom();
       const slide = this.slideRef;
       const frags = slide.querySelectorAll(".fragment");
+      let currentOrder = 0;
       if (frags && frags.length && !this.context.overview) {
-        Array.prototype.slice.call(frags, 0).forEach((frag, i) => {
-          frag.dataset.fid = i;
-          return (
-            this.props.dispatch &&
-            this.props.dispatch(
-              addFragment({
-                slide: this.props.hash,
-                id: i,
-                visible: this.props.lastSlideIndex > this.props.slideIndex
-              })
-            )
-          );
-        });
+        Array.prototype.slice
+          .call(frags, 0)
+          .sort(
+            (lhs, rhs) =>
+              parseInt(lhs.dataset.order, 10) - parseInt(rhs.dataset.order, 10)
+          )
+          .forEach(frag => {
+            frag.dataset.fid = currentOrder;
+            if (this.props.dispatch) {
+              this.props.dispatch(
+                addFragment({
+                  className: frag.className || "",
+                  slide: this.props.hash,
+                  id: `${this.props.hash}-${currentOrder}`,
+                  animations: Array.from({
+                    length: frag.dataset.animCount
+                  }).fill(this.props.lastSlideIndex > this.props.slideIndex)
+                })
+              );
+            }
+            currentOrder += 1;
+          });
       }
       window.addEventListener("load", this.setZoom);
       window.addEventListener("resize", this.setZoom);
+
+      if (isFunction(this.props.onActive)) {
+        this.props.onActive(this.props.slideIndex);
+      }
+
+      if (this.props.getAppearStep) {
+        /* eslint-disable no-console */
+        console.warn(
+          "getAppearStep has been deprecated, use getAnimStep instead"
+        );
+        /* eslint-enable */
+      }
+    }
+
+    componentDidUpdate() {
+      const { steps, slideIndex } = this.stepCounter.getSteps();
+      const stepFunc = this.props.getAnimStep || this.props.getAppearStep;
+      if (stepFunc) {
+        if (slideIndex === this.props.slideIndex) {
+          stepFunc(steps);
+        }
+      }
     }
 
     componentWillUnmount() {
+      window.removeEventListener("load", this.setZoom);
       window.removeEventListener("resize", this.setZoom);
     }
 
-    setZoom = () => {
+    componentWillEnter(callback) {
+      this.setState({ transitioning: false, reverse: false, z: 1 });
+      this.routerCallback(callback);
+    }
+
+    componentWillAppear(callback) {
+      this.setState({ transitioning: false, reverse: false, z: 1 });
+      this.routerCallback(callback);
+    }
+
+    componentWillLeave(callback) {
+      this.setState({ transitioning: true, reverse: true, z: "" });
+      this.routerCallback(callback);
+    }
+
+    routerCallback(callback) {
+      const { transition, transitionDuration } = this.props;
+      if (transition.length > 0) {
+        setTimeout(() => callback(), transitionDuration);
+      } else {
+        callback();
+      }
+    }
+
+    setZoom() {
       const mobile = window.matchMedia("(max-width: 628px)").matches;
       const content = this.contentRef;
       if (content) {
-        const zoom = this.props.viewerScaleMode ? 1 : content.offsetWidth / 1000;
+        const zoom = this.props.viewerScaleMode
+          ? 1
+          : content.offsetWidth / this.context.contentWidth;
 
-        const contentScaleY = content.parentNode.offsetHeight / 700;
+        const contentScaleY =
+          content.parentNode.offsetHeight / this.context.contentHeight;
         const contentScaleX = this.props.viewerScaleMode
-          ? content.parentNode.offsetWidth / 1000
-          : content.parentNode.offsetWidth / 700;
+          ? content.parentNode.offsetWidth / this.context.contentWidth
+          : content.parentNode.offsetWidth / this.context.contentHeight;
         const minScale = Math.min(contentScaleY, contentScaleX);
 
         let contentScale = minScale < 1 ? minScale : 1;
         if (mobile && this.props.viewerScaleMode !== true) {
           contentScale = 1;
         }
-
         this.setState({
           zoom: zoom > 0.6 ? zoom : 0.6,
           contentScale
         });
       }
-    };
-
-    allStyles() {
-      const { align, print } = this.props;
-
-      const styles = {
-        outer: {
-          position: this.props.export ? "relative" : "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          overflow: "hidden",
-          backgroundColor: this.context.styles.global.body.background
-            ? this.context.styles.global.body.background
-            : "",
-          ...this.props.style
-        },
-        inner: {
-          display: "flex",
-          position: "relative",
-          flex: 1,
-          alignItems: align ? align.split(" ")[1] : "center",
-          justifyContent: align ? align.split(" ")[0] : "center"
-        },
-        content: {
-          flex: 1,
-          maxHeight: this.props.maxHeight || 700,
-          maxWidth: this.props.maxWidth || 1000,
-          transform: `scale(${this.state.contentScale})`,
-          padding: this.state.zoom > 0.6 ? this.props.margin || 40 : 10
-        }
-      };
-
-      const overViewStyles = {
-        inner: {
-          flexDirection: "column"
-        },
-        content: {
-          width: "100%"
-        }
-      };
-
-      const printStyles = print
-        ? {
-          backgroundColor: "white",
-          backgroundImage: "none"
-        }
-        : {};
-
-      return { styles, overViewStyles, printStyles };
     }
 
-    @renderTransition render() {
-      const { presenterStyle } = this.props;
-      const { styles, overViewStyles, printStyles } = this.allStyles();
+    transitionDirection() {
+      const { slideIndex, lastSlideIndex } = this.props;
+      const routeSlideIndex = this.getRouteSlideIndex();
+      return this.state.reverse
+        ? slideIndex > routeSlideIndex
+        : slideIndex > lastSlideIndex;
+    }
+
+    getTransitionKeys() {
+      const {
+        props: { transition = [], transitionIn = [], transitionOut = [] },
+        state: { reverse }
+      } = this;
+      if (reverse && transitionOut.length > 0) {
+        return transitionOut;
+      } else if (transitionIn.length > 0) {
+        return transitionIn;
+      }
+      return transition;
+    }
+
+    // eslint-disable-next-line
+    getTransitionStyles() {
+      const { transitioning, z } = this.state;
+      const transition = this.getTransitionKeys();
+      let styles = { zIndex: z };
+      let transformValue = "";
+
+      if (transition.indexOf("fade") !== -1) {
+        styles = { ...styles, opacity: transitioning ? 0 : 1 };
+      }
+
+      if (transition.indexOf("zoom") !== -1) {
+        transformValue += ` scale(${transitioning ? 0.1 : 1.0})`;
+      }
+
+      if (transition.indexOf("slide") !== -1) {
+        const offset = this.transitionDirection() ? 100 : -100;
+        transformValue += ` translate3d(${transitioning ? offset : 0}%, 0, 0)`;
+      } else {
+        transformValue += " translate3d(0px, 0px, 0px)";
+      }
+
+      if (transition.indexOf("spin") !== -1) {
+        const angle = this.transitionDirection() ? 90 : -90;
+        transformValue += ` rotateY(${transitioning ? angle : 0}deg)`;
+      }
+
+      const functionStyles = transition.reduce((memo, current) => {
+        if (isFunction(current)) {
+          return {
+            ...memo,
+            ...current(transitioning, this.transitionDirection())
+          };
+        }
+        return memo;
+      }, {});
+
+      return { ...styles, transform: transformValue, ...functionStyles };
+    }
+
+    getRouteSlideIndex() {
+      const { slideReference } = this.props;
+      const { route } = this.context.store.getState();
+      const { slide } = route;
+      const slideIndex = findIndex(slideReference, reference => {
+        return slide === String(reference.id);
+      });
+      return Math.max(0, slideIndex);
+    }
+
+    render() {
+      const { presenterStyle, children, transitionDuration } = this.props;
 
       if (!this.props.viewerScaleMode) {
         document.documentElement.style.fontSize = `${16 * this.state.zoom}px`;
@@ -151,38 +250,51 @@ export default (Component) => {
       const contentClass = isUndefined(this.props.className)
         ? ""
         : this.props.className;
+
       return (
-        <div
-          className="spectacle-slide"
-          ref={(s) => {
-            this.slideRef = s;
-          }}
-          style={[
-            styles.outer,
-            getStyles.call(this),
-            getSlideStyles.call(this),
-            printStyles,
-            presenterStyle
-          ]}
+        <VictoryAnimation
+          data={this.getTransitionStyles()}
+          duration={transitionDuration}
+          easing="quadInOut"
         >
-          <div
-            style={[styles.inner, this.context.overview && overViewStyles.inner]}
-          >
-            <div
-              ref={(c) => {
-                this.contentRef = c;
+          {animatedStyles => (
+            <SlideContainer
+              className="spectacle-slide"
+              innerRef={s => {
+                this.slideRef = s;
               }}
-              className={`${contentClass} spectacle-content`}
-              style={[
-                styles.content,
-                this.context.styles.components.content,
-                this.context.overview && overViewStyles.content
-              ]}
+              exportMode={this.props.export}
+              printMode={this.props.print}
+              background={this.context.styles.global.body.background}
+              styles={{
+                base: { ...getStyles.call(this), ...getSlideStyles.call(this) },
+                presenter: presenterStyle
+              }}
+              style={{ ...animatedStyles }}
             >
-              <Component {...this.props}/>
-            </div>
-          </div>
-        </div>
+              <SlideContentWrapper
+                align={this.props.align}
+                overviewMode={this.context.overview}
+              >
+                <SlideContent
+                  innerRef={c => {
+                    this.contentRef = c;
+                  }}
+                  className={`${contentClass} spectacle-content`}
+                  overviewMode={this.context.overview}
+                  width={this.context.contentWidth}
+                  height={this.context.contentHeight}
+                  scale={this.state.contentScale}
+                  zoom={this.state.zoom}
+                  margin={this.props.margin}
+                  styles={{ context: this.context.styles.components.content }}
+                >
+                  <Component {...this.props} />
+                </SlideContent>
+              </SlideContentWrapper>
+            </SlideContainer>
+          )}
+        </VictoryAnimation>
       );
     }
   }
@@ -191,8 +303,7 @@ export default (Component) => {
     align: "center center",
     presenterStyle: {},
     style: {},
-    viewerScaleMode: false,
-    inverted: false
+    viewerScaleMode: false
   };
 
   Slide.propTypes = {
@@ -201,22 +312,28 @@ export default (Component) => {
     className: PropTypes.string,
     dispatch: PropTypes.func,
     export: PropTypes.bool,
+    getAppearStep: PropTypes.func,
     hash: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    inverted: PropTypes.bool,
     lastSlideIndex: PropTypes.number,
     margin: PropTypes.number,
-    maxHeight: PropTypes.number,
-    maxWidth: PropTypes.number,
     notes: PropTypes.any,
+    onActive: PropTypes.func,
     presenterStyle: PropTypes.object,
     print: PropTypes.bool,
     slideIndex: PropTypes.number,
+    slideReference: PropTypes.array,
     style: PropTypes.object,
+    transition: PropTypes.array,
+    transitionDuration: PropTypes.number,
+    transitionIn: PropTypes.array,
+    transitionOut: PropTypes.array,
     viewerScaleMode: PropTypes.bool
   };
 
   Slide.contextTypes = {
     styles: PropTypes.object,
+    contentWidth: PropTypes.number,
+    contentHeight: PropTypes.number,
     export: PropTypes.bool,
     print: PropTypes.object,
     overview: PropTypes.bool,
@@ -224,9 +341,11 @@ export default (Component) => {
   };
 
   Slide.childContextTypes = {
-    slideHash: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+    slideHash: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    stepCounter: PropTypes.shape({
+      setFragments: PropTypes.func
+    })
   };
 
   return Slide;
-
 };

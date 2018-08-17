@@ -3,20 +3,24 @@ import React from "react";
 import PropTypes from "prop-types";
 
 // Import Spectacle Core tags
-import {
-  Heading
-} from "spectacle";
+import { Heading } from "spectacle";
 
 import asSlide from "./as-slide.jsx";
 import { headingColor } from "./utilities.jsx";
 import FullScreen from "./full-screen.jsx";
 
-const SimpleSlide = ({ inverted, statement, size, fit, caps }) => {
+const SimpleSlide = ({ inverted, statement, size, fit, caps, children }) => {
   return (
     <FullScreen column>
-      <Heading size={size} fit={fit} caps={caps} textColor={headingColor(inverted)}>
+      <Heading
+        size={size}
+        fit={fit}
+        caps={caps}
+        textColor={headingColor(inverted)}
+      >
         {statement}
       </Heading>
+      {children}
     </FullScreen>
   );
 };

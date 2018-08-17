@@ -24,10 +24,11 @@ const DoubleImageSlide = ({
   fit,
   caps,
   inverted,
-  text
+  text,
+  children
 }) => {
-  const imageSrc1 = require(`../../assets/${image1}`).replace("/", "");
-  const imageSrc2 = require(`../../assets/${image2}`).replace("/", "");
+  const imageSrc1 = require(`../../assets/images/${image1}`).replace("/", "");
+  const imageSrc2 = require(`../../assets/images/${image2}`).replace("/", "");
 
   return (
     <FullScreen column>
@@ -63,6 +64,7 @@ const DoubleImageSlide = ({
           </Text>
         </div>
       )}
+      {children}
     </FullScreen>
   );
 };

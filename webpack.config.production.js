@@ -23,7 +23,8 @@ module.exports = {
       compressor: {
         warnings: false
       }
-    })
+    }),
+    new webpack.IgnorePlugin(/\.\/canvas.js/)
   ],
   module: {
     loaders: [{

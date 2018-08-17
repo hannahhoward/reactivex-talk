@@ -4,7 +4,7 @@ module.exports = function (shipit) {
   shipit.initConfig({
     default: {
       workspace: "/tmp/shipit",
-      deployTo: "/var/www/c5-summit-2018.techgirlwonder.com"",
+      deployTo: "/var/www/reactivex-talk.techgirlwonder.com",
       repositoryUrl: "git@github.com:hannahhoward/c5-summit-2018.git",
       ignores: [".git", "node_modules"],
       keepReleases: 2,
@@ -17,7 +17,7 @@ module.exports = function (shipit) {
   });
 
   shipit.blTask("build", () => {
-    return shipit.local("ln -s ~/presentations/future-c5-stack/node_modules /tmp/shipit/node_modules").then(() => {
+    return shipit.local("ln -s ~/presentations/rxjs-talk/node_modules /tmp/shipit/node_modules").then(() => {
       return shipit.local("npm install", { cwd: "/tmp/shipit" });
     }).then(() => {
       return shipit.local("npm run build", { cwd: "/tmp/shipit" });

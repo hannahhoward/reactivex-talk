@@ -15,12 +15,27 @@ const imageStyle = {
   transform: "translateX(-50%)"
 };
 
-const ImageSlide = ({ title, image, size, fit, caps, inverted, text }) => {
-  const imageSrc = require(`../../assets/${image}`).replace("/", "");
+const ImageSlide = ({
+  title,
+  image,
+  size,
+  fit,
+  caps,
+  inverted,
+  text,
+  children
+}) => {
+  const imageSrc = require(`../../assets/images/${image}`).replace("/", "");
   const thisImageStyle = {
     ...imageStyle,
+    zoom: 8, //increase if you have very small images
+    display: "block",
+    margin: "auto",
+    height: "auto",
+    width: "auto",
+    maxWidth: "100%",
     top: title ? "10%" : "0%",
-    height: title ? "90%" : "100%"
+    maxHeight: title ? "90%" : "100%"
   };
   return (
     <FullScreen column>
@@ -37,7 +52,14 @@ const ImageSlide = ({ title, image, size, fit, caps, inverted, text }) => {
           </Heading>
         </div>
       )}
-      <div style={{ flex: 1, position: "relative" }}>
+      <div
+        style={{
+          flex: 1,
+          position: "relative",
+          width: "100%",
+          justifyContent: "stretch"
+        }}
+      >
         <Image style={thisImageStyle} src={imageSrc} />
       </div>
       {!!text && (
@@ -47,6 +69,7 @@ const ImageSlide = ({ title, image, size, fit, caps, inverted, text }) => {
           </Text>
         </div>
       )}
+      {children}
     </FullScreen>
   );
 };
