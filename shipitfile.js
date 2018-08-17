@@ -5,7 +5,7 @@ module.exports = function (shipit) {
     default: {
       workspace: "/tmp/shipit",
       deployTo: "/var/www/reactivex-talk.techgirlwonder.com",
-      repositoryUrl: "git@github.com:hannahhoward/c5-summit-2018.git",
+      repositoryUrl: "git@github.com:hannahhoward/reactivex-talk.git",
       ignores: [".git", "node_modules"],
       keepReleases: 2,
       deleteOnRollback: false,
