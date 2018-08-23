@@ -42,7 +42,8 @@ module.exports = {
       loader: "url-loader?limit=8192"
     }, {
       test: /\.svg$/,
-      loader: "url-loader?limit=10000&mimetype=image/svg+xml"
+      loader: "file-loader?mimetype=image/svg+xml",
+      include: path.join(__dirname, "assets")
     }]
   },
   resolve: {
