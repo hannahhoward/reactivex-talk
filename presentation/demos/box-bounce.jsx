@@ -37,7 +37,7 @@ const BoundBox = withViewModel(
     inputs: {
       position: position$
     }
-  },
+  })(
   ({ position }) => <RedBox pose={position} />
 );
 
@@ -53,7 +53,7 @@ const LeftButton = withViewModel(
     outputs: {
       onClick: leftClick$
     }
-  },
+  })(
   ({ onClick }) => <Button onClick={onClick}>Go Left</Button>
 );
 
@@ -62,7 +62,7 @@ const RightButton = withViewModel(
     outputs: {
       onClick: rightClick$
     }
-  },
+  })(
   ({ onClick }) => <Button onClick={onClick}>Go Right</Button>
 );
 
@@ -175,7 +175,9 @@ const PositionSignal = Signal(position$.pipe(delay(2000)), [
     }
   }
 ]);
-
+const SVGText = styled.text`
+  fill: ${colors.secondary};
+`;
 const BoxBounce = () => (
   <Panes>
     <Pen>

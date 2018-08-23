@@ -12,7 +12,7 @@ import FullScreen from "./full-screen.jsx";
 const QuoteSlide = ({ inverted, quote, cite, children }) => {
   return (
     <FullScreen column>
-      <BlockQuote>
+      <BlockQuote style={{ textAlign: "right" }}>
         <Quote textColor={headingColor(inverted)}>{quote}</Quote>
         <Cite textColor={textColor(inverted)}>{cite}</Cite>
       </BlockQuote>
