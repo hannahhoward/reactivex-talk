@@ -17,9 +17,7 @@ module.exports = function (shipit) {
   });
 
   shipit.blTask("build", () => {
-    return shipit.local("ln -s ~/presentations/rxjs-talk/node_modules /tmp/shipit/node_modules").then(() => {
-      return shipit.local("npm install", { cwd: "/tmp/shipit" });
-    }).then(() => {
+    return shipit.local("npm install", { cwd: "/tmp/shipit" }).then(() => {
       return shipit.local("npm run build", { cwd: "/tmp/shipit" });
     });
   });

@@ -1,25 +1,25 @@
-import { withViewModel } from "@rxreact/core";
+import { withViewModel } from '@rxreact/core'
 
-const PositionedBox = ({ position }) => <RedBox pose={position} />;
+const PositionedBox = ({ position }) => <RedBox pose={position} />
 
 const boxVm = {
   inputs: {
     position: position$
   }
-};
+}
 
-const BoundBox = withViewModel(boxVm)(PositionedBox);
+const BoundBox = withViewModel(boxVm)(PositionedBox)
 
 const LeftButton = withViewModel({
   outputs: {
     onClick: leftClick$
   }
-})(({ onClick }) => <Button onClick={onClick}> Go Left </Button>);
+})(({ onClick }) => <Button onClick={onClick}> Go Left </Button>)
 
 const ConnectedLoginForm = withViewModel({
   inputs: {
-    username: username$.pipe(startWith("")),
-    password: password$.pipe(startWith("")),
+    username: username$.pipe(startWith('')),
+    password: password$.pipe(startWith('')),
     loginInProgress: loginInProgress$,
     loginFailureMessage: loginFailureMessage$
   },
@@ -28,6 +28,6 @@ const ConnectedLoginForm = withViewModel({
     passwordChanged: password$,
     submitButton: submitButton$
   }
-})(LoginForm);
+})(LoginForm)
 
 // fin

@@ -83,7 +83,7 @@ const RxJsGraphSlide = ({ size, fit, caps, inverted, children }) => {
           textColor={headingColor(inverted)}
           style={{ marginBottom: ".5em" }}
         >
-          Talk Callback
+          Important Data Point
         </Heading>
       </div>
       <div

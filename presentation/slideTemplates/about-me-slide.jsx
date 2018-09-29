@@ -29,10 +29,11 @@ const Column = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
+  flex-basis: 33%;
   justify-content: space-evenly;
 `;
 
-const AboutMeSlide = () => {
+const AboutMeSlide = ({ children }) => {
   const tgwLogo = require("../../assets/images/techgirlwonder-01.png").replace(
     "/",
     ""
@@ -41,6 +42,7 @@ const AboutMeSlide = () => {
     "/",
     ""
   );
+  const poohBear = require("../../assets/images/poohbear.jpg").replace("/", "");
   return (
     <FullScreen column>
       <Row style={{ flexShrink: 0 }}>
@@ -52,16 +54,29 @@ const AboutMeSlide = () => {
         <Appear order={0}>
           <Column>
             <Image src={tgwLogo} style={imageStyle} />
-            <Text>@techgirlwonder</Text>
+            <Text>
+              @techgirlwonder
+              <br />
+              she/her
+            </Text>
           </Column>
         </Appear>
         <Appear order={1}>
           <Column>
             <Image src={c5Logo} style={imageStyle} />
-            <Text>hannah@carbonfive.com</Text>
+            <Text style={{ wordBreak: "break-word" }}>
+              hannah@carbonfive.com
+            </Text>
+          </Column>
+        </Appear>
+        <Appear order={2}>
+          <Column>
+            <Image src={poohBear} style={imageStyle} />
+            <Text>Personal Anecdote: I have a dog</Text>
           </Column>
         </Appear>
       </Row>
+      {children}
     </FullScreen>
   );
 };

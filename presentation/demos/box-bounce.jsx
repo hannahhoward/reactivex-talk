@@ -1,21 +1,49 @@
 import React from "react";
 import posed from "react-pose";
 import { withViewModel } from "@rxreact/core";
-import { Subject, merge } from "rxjs";
-import { map, startWith, delay } from "rxjs/operators";
+import { Subject, merge, fromEvent } from "rxjs";
+import {
+  map,
+  startWith,
+  delay,
+  filter,
+  distinctUntilChanged
+} from "rxjs/operators";
 import styled from "styled-components";
 import asSlide from "../slideTemplates/as-slide";
 import FullScreen from "../slideTemplates/full-screen";
 import colors from "../slideTemplates/colors";
 import Signal from "./visualizer/Signal";
-import { Appear } from "spectacle";
+import { Appear, Notes } from "spectacle";
 
 const leftClick$ = new Subject();
 const rightClick$ = new Subject();
 
-const leftClickPosition$ = leftClick$.pipe(map(_ => "left"));
+leftClick$.subscribe(_ => {
+  localStorage.setItem("box-bounce:left-click", new Date());
+});
 
-const rightClickPosition$ = rightClick$.pipe(map(_ => "right"));
+rightClick$.subscribe(_ => {
+  localStorage.setItem("box-bounce:right-click", new Date());
+});
+
+const storage$ = fromEvent(window, "storage");
+const storageLeftClick$ = storage$.pipe(
+  filter(event => event.key === "box-bounce:left-click"),
+  map(event => event.newValue),
+  distinctUntilChanged()
+);
+const storageRightClick$ = storage$.pipe(
+  filter(event => event.key === "box-bounce:right-click"),
+  map(event => event.newValue),
+  distinctUntilChanged()
+);
+
+const allLeftClicks$ = merge(leftClick$, storageLeftClick$);
+const leftClickPosition$ = allLeftClicks$.pipe(map(_ => "left"));
+
+const allRightClicks$ = merge(rightClick$, storageRightClick$);
+const rightClickPosition$ = allRightClicks$.pipe(map(_ => "right"));
 
 const position$ = merge(leftClickPosition$, rightClickPosition$).pipe(
   startWith("left")
@@ -32,14 +60,11 @@ const RedBox = styled(Box)`
   background-color: ${colors.primary};
 `;
 
-const BoundBox = withViewModel(
-  {
-    inputs: {
-      position: position$
-    }
-  })(
-  ({ position }) => <RedBox pose={position} />
-);
+const BoundBox = withViewModel({
+  inputs: {
+    position: position$
+  }
+})(({ position }) => <RedBox pose={position} />);
 
 const Button = styled.div`
   padding: 20px;
@@ -48,23 +73,17 @@ const Button = styled.div`
   cursor: pointer;
 `;
 
-const LeftButton = withViewModel(
-  {
-    outputs: {
-      onClick: leftClick$
-    }
-  })(
-  ({ onClick }) => <Button onClick={onClick}>Go Left</Button>
-);
+const LeftButton = withViewModel({
+  outputs: {
+    onClick: leftClick$
+  }
+})(({ onClick }) => <Button onClick={onClick}>Go Left</Button>);
 
-const RightButton = withViewModel(
-  {
-    outputs: {
-      onClick: rightClick$
-    }
-  })(
-  ({ onClick }) => <Button onClick={onClick}>Go Right</Button>
-);
+const RightButton = withViewModel({
+  outputs: {
+    onClick: rightClick$
+  }
+})(({ onClick }) => <Button onClick={onClick}>Go Right</Button>);
 
 const Pen = styled.div`
   display: flex;
@@ -96,7 +115,7 @@ const Panes = styled.div`
   align-items: stretch;
 `;
 
-const LeftClickSignal = Signal(leftClick$.pipe(map(_ => "click!")), [
+const LeftClickSignal = Signal(allLeftClicks$.pipe(map(_ => "click!")), [
   {
     coord: {
       x: 110,
@@ -112,7 +131,7 @@ const LeftClickSignal = Signal(leftClick$.pipe(map(_ => "click!")), [
   }
 ]);
 
-const RightClickSignal = Signal(rightClick$.pipe(map(_ => "click!")), [
+const RightClickSignal = Signal(allRightClicks$.pipe(map(_ => "click!")), [
   {
     coord: {
       x: 345,
@@ -338,5 +357,24 @@ const BoxBounce = () => (
 export default asSlide(() => (
   <FullScreen column>
     <BoxBounce />
+    <Notes>
+      <p>Now let's look at a UI example</p>
+      <p>
+        Here we have two buttons and we want to move a ball back and forth when
+        we click on the buttons
+      </p>
+      <p>
+        Let's say we have two observables that represent the clicks on left
+        button and the right button
+      </p>
+      <p>
+        We could transform each of those observables with map in to the position
+        you want the ball to be in when the event happens
+      </p>
+      <p>
+        And then if you just merged those two streams, you'd get the current
+        position of the ball
+      </p>
+    </Notes>
   </FullScreen>
 ));
