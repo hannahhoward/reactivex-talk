@@ -1286,7 +1286,7 @@ export default class Presentation extends React.Component {
           code={require('!!raw-loader!../assets/rxReactReducer.js')}
           ranges={[{ loc: [0, 19] }]}
         />
-        <SimpleSlide statement="@rxreact/reducer" />
+        <SimpleSlide statement="@rxreact/process" />
         <ImageSlide
           inverted
           title="That's all folks!"
