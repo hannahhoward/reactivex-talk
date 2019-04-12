@@ -21,7 +21,7 @@ import { Appear, Notes } from 'spectacle'
 
 const api = {
   login: ({ username, password }) => {
-    if (username === 'qconsf' && password === 'awesome') {
+    if (username === 'rxjs' && password === 'awesome') {
       return new Promise(resolve => {
         setTimeout(
           () =>

@@ -1,4 +1,4 @@
-import { withViewModel } from '@rxreact/signal-connect'
+import { connect } from '@rxreact/signal-connect'
 
 const PositionedBox = ({ position }) => <RedBox pose={position} />
 
